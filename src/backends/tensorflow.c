@@ -226,6 +226,29 @@ RAI_Model *RAI_ModelCreateTF(RAI_Backend backend, RAI_Device device,
   TF_Status *sessionStatus = TF_NewStatus();
   TF_Session *session = TF_NewSession(model, sessionOptions, sessionStatus);
 
+
+////////////////////////////////////////////////////////////////////////////////
+  TF_Status *deviceStatus = TF_NewStatus();
+  TF_DeviceList *deviceList = TF_SessionListDevices(session, deviceStatus);
+  if (TF_GetCode(deviceStatus) != TF_OK) {
+    printf("\n Some Error \n");
+  }
+  else{
+    int deviceCount = TF_DeviceListCount(deviceList);
+    for (int i = 0; i < deviceCount; ++i)
+    {
+      TF_Status *deviceNameStatus = TF_NewStatus();
+      const char* deviceName = TF_DeviceListType(deviceList, i, deviceNameStatus);
+      printf("\nDevice Name: %s\n", deviceName);
+      TF_DeleteStatus(deviceNameStatus);
+    }
+  }
+
+  TF_DeleteStatus(deviceStatus);
+  TF_DeleteDeviceList(deviceList);
+
+////////////////////////////////////////////////////////////////////////
+
   if (TF_GetCode(sessionStatus) != TF_OK) {
     RAI_SetError(error, RAI_EMODELCREATE, RedisModule_Strdup(TF_Message(status)));
     // TODO: free memory
