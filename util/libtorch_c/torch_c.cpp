@@ -219,7 +219,9 @@ void torchRunModule(ModuleContext* ctx, const char* fnName,
   int count = 0;
   for (int i=0; i<stack.size(); i++) {
     if (count > nOutputs-1) {
-      throw std::runtime_error(std::string("Function returned unexpected number of outputs - ") + fnName);
+      throw std::runtime_error(std::string("Function ") + fnName +
+                              std::string(" has got an unexpected number of inputs or "
+                                          "it returned an unexpected number of outputs"));
     }
 
     if (stack[i].isTensor()) {
@@ -238,17 +240,19 @@ void torchRunModule(ModuleContext* ctx, const char* fnName,
           outputs[count++] = toManagedDLPack(elements[j].toTensor().to(output_device));
         }
         else {
-          throw std::runtime_error(std::string("Function returned non-tensor values") + fnName);
+          throw std::runtime_error(std::string("Function ") + fnName +
+                                   std::string(" returned non-tensor values"));
         }
       }
     }
     else {
-      throw std::runtime_error(std::string("Function returned non-tensor values") + fnName);
+      throw std::runtime_error(std::string("Function ") + fnName + std::string(" returned non-tensor values"));
     }
   }
 
   if (count != nOutputs) {
-    throw std::runtime_error(std::string("Function returned unexpected number of outputs - ") + fnName);
+    throw std::runtime_error(std::string("Function ") + fnName +
+                             std::string(" returned unexpected number of outputs - ") + std::to_string(count));
   }
 }
 
